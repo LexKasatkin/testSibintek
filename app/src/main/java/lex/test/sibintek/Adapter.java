@@ -160,5 +160,7 @@ public class Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     }
 
-
+    public void removeItemAtPosition(int position) {
+        users.remove(position);
+    }
 }

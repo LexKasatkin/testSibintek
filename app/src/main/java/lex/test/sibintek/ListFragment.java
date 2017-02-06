@@ -121,7 +121,7 @@ public class ListFragment extends  android.support.v4.app.Fragment{
         }
         @Override
         protected void onPreExecute() {
-            urlLoad = "https://api.github.com/users/whatever/followers?page=" + String.valueOf(counterOfLoading) + "&per_page=9";
+            urlLoad = "https://api.github.com/users/whatever/followers?page=" + String.valueOf(counterOfLoading) + "&per_page=15";
             super.onPreExecute();
         }
 
@@ -142,28 +142,29 @@ public class ListFragment extends  android.support.v4.app.Fragment{
                 }
                 if (listUser.userArrayList.size() != 0) {
                     if (counterOfLoading > 1) {
+                        mAdapter.notifyItemRemoved(listUser.userArrayList.size());
+                        mAdapter.notifyDataSetChanged();
                         listUser.userArrayList.remove(listUser.userArrayList.size() -1);
-                        mAdapter.notifyItemRemoved(listUser.userArrayList.size() );
+
                     }
                     for (int i = 0; i < listUser.userArrayList.size(); i++) {
-                        handler.post(new Runnable() {
-                            @Override
-                            public void run() {
+//                                handler.post(new Runnable() {
+//                            @Override
+//                            public void run() {
                                 mAdapter.notifyItemInserted(listUser.userArrayList.size());
-                            }
-                        });
+//                            }
+//                        });
                     }
-                    mAdapter.notifyDataSetChanged();
                     mAdapter.setLoaded();
-                    mAdapter.notifyItemRemoved(listUser.userArrayList.size());
+                    mAdapter.notifyDataSetChanged();
+//                    mAdapter.notifyItemRemoved(listUser.userArrayList.size());
             }
         }
     }
 
     public void LoadData(){
-        counterOfLoading=1;
-        if(counterOfLoading==1){
-            mSwipeRefreshLayout.setRefreshing(true);
+        if (loadItemsTask!=null) {
+            loadItemsTask.cancel(true);
         }
         handler = new Handler();
         listUser = new ListUser();
@@ -172,6 +173,15 @@ public class ListFragment extends  android.support.v4.app.Fragment{
         mRecyclerView.setLayoutManager(mLayoutManager);
         mAdapter = new Adapter(listUser.userArrayList, mRecyclerView);
         mRecyclerView.setAdapter(mAdapter);
+        counterOfLoading=1;
+        if(counterOfLoading==1){
+            mSwipeRefreshLayout.post(new Runnable() {
+                @Override
+                public void run() {
+                    mSwipeRefreshLayout.setRefreshing(true);
+                }
+            });
+        }
         if(NetworkManager.isNetworkAvailable(getContext())){
             loadItemsTask=new LoadItemsTask(counterOfLoading);
             loadItemsTask.execute();
