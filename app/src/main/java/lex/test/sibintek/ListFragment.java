@@ -30,7 +30,7 @@ public class ListFragment extends  android.support.v4.app.Fragment{
     Adapter mAdapter=null;
     protected Handler handler;
     private String urlLoad;
-    int counterOfLoading=1;
+    int counterOfLoading;
     ListUser listUser;
     private LinearLayoutManager mLayoutManager;
 
@@ -69,6 +69,9 @@ public class ListFragment extends  android.support.v4.app.Fragment{
         View v = inflater.inflate(R.layout.fragment_list, container, false);
         mRecyclerView = (RecyclerView) v.findViewById(R.id.recyclerview);
         mSwipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipeRefreshLayout);
+        if(counterOfLoading==1){
+            mSwipeRefreshLayout.setRefreshing(true);
+        }
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -117,10 +120,7 @@ public class ListFragment extends  android.support.v4.app.Fragment{
 
         @Override
         protected void onPreExecute() {
-            if(counterOfLoading==1){
-                mSwipeRefreshLayout.setRefreshing(true);
-            }
-            urlLoad = "https://api.github.com/users/whatever/followers?page=" + String.valueOf(counterOfLoading) + "&per_page=5";
+            urlLoad = "https://api.github.com/users/whatever/followers?page=" + String.valueOf(counterOfLoading) + "&per_page=9";
             super.onPreExecute();
         }
 
@@ -139,7 +139,7 @@ public class ListFragment extends  android.support.v4.app.Fragment{
                 }
                 if (listUser.userArrayList.size() != 0) {
                     if (counterOfLoading > 1) {
-                    listUser.userArrayList.remove(listUser.userArrayList.size() - 1);
+                        listUser.userArrayList.remove(listUser.userArrayList.size() -1);
                         mAdapter.notifyItemRemoved(listUser.userArrayList.size() );
                     }
                     for (int i = 0; i < listUser.userArrayList.size(); i++) {
@@ -147,15 +147,12 @@ public class ListFragment extends  android.support.v4.app.Fragment{
                             @Override
                             public void run() {
                                 mAdapter.notifyItemInserted(listUser.userArrayList.size());
-
                             }
                         });
                     }
-
-                    mAdapter.notifyItemRemoved(listUser.userArrayList.size() -1);
-
                     mAdapter.notifyDataSetChanged();
                     mAdapter.setLoaded();
+                    mAdapter.notifyItemRemoved(listUser.userArrayList.size() -1);
                     counterOfLoading++;
             }
         }
@@ -182,7 +179,7 @@ public class ListFragment extends  android.support.v4.app.Fragment{
             @Override
             public void onLoadMore() {
                 listUser.userArrayList.add(null);
-                mAdapter.notifyItemInserted(listUser.userArrayList.size() - 1);
+                mAdapter.notifyItemInserted(listUser.userArrayList.size()-1);
                 if(NetworkManager.isNetworkAvailable(getContext())){
                     LoadItemsTask loadItemsTask=new LoadItemsTask();
                     loadItemsTask.execute();
