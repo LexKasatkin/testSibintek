@@ -86,7 +86,7 @@ public class Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position) {
         mContext=holder.itemView.getContext();
         if (holder instanceof TextViewHolder) {
-            ((TextViewHolder) holder).mTextView.setText(users.get(position).getLogin().toString()
+            ((TextViewHolder) holder).mTextView.setText("\n"+users.get(position).getLogin().toString()
             +"\n"+users.get(position).getId()+"\n"+users.get(position).getAvatar_url());
         } else {
             ((ProgressViewHolder) holder).progressBar.setIndeterminate(true);

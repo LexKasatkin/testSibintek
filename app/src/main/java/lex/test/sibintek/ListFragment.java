@@ -142,10 +142,8 @@ public class ListFragment extends  android.support.v4.app.Fragment{
                 }
                 if (listUser.userArrayList.size() != 0) {
                     if (counterOfLoading > 1) {
+                        listUser.userArrayList.remove(listUser.userArrayList.size() - 1);
                         mAdapter.notifyItemRemoved(listUser.userArrayList.size());
-                        mAdapter.notifyDataSetChanged();
-                        listUser.userArrayList.remove(listUser.userArrayList.size() -1);
-
                     }
                     for (int i = 0; i < listUser.userArrayList.size(); i++) {
 //                                handler.post(new Runnable() {
