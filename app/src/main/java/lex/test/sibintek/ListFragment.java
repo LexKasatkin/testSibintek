@@ -137,7 +137,6 @@ public class ListFragment extends  android.support.v4.app.Fragment{
         @Override
         protected void onPostExecute(final String jsonString) {
             if (counterOfLoading > 1) {
-
                 listUser.userArrayList.remove(listUser.userArrayList.size()-1);
                 mAdapter.notifyItemRemoved(listUser.userArrayList.size());
             }
@@ -157,6 +156,7 @@ public class ListFragment extends  android.support.v4.app.Fragment{
     }
 
     public void LoadData(){
+        counterOfLoading=1;
         if (loadItemsTask!=null) {
             loadItemsTask.cancel(true);
         }
@@ -167,7 +167,7 @@ public class ListFragment extends  android.support.v4.app.Fragment{
         mRecyclerView.setLayoutManager(mLayoutManager);
         mAdapter = new Adapter(listUser.userArrayList, mRecyclerView);
         mRecyclerView.setAdapter(mAdapter);
-        counterOfLoading=1;
+
         if(counterOfLoading==1){
             mSwipeRefreshLayout.post(new Runnable() {
                 @Override
