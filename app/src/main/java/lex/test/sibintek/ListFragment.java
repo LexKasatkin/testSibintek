@@ -136,26 +136,22 @@ public class ListFragment extends  android.support.v4.app.Fragment{
 
         @Override
         protected void onPostExecute(final String jsonString) {
+            if (counterOfLoading > 1) {
+
+                listUser.userArrayList.remove(listUser.userArrayList.size()-1);
+                mAdapter.notifyItemRemoved(listUser.userArrayList.size());
+            }
             listUser.setUsersFromJSONString(jsonString);
                 if (counterOfLoading == 1) {
                     mSwipeRefreshLayout.setRefreshing(false);
                 }
                 if (listUser.userArrayList.size() != 0) {
-                    if (counterOfLoading > 1) {
-                        listUser.userArrayList.remove(listUser.userArrayList.size() - 1);
-                        mAdapter.notifyItemRemoved(listUser.userArrayList.size());
-                    }
+
                     for (int i = 0; i < listUser.userArrayList.size(); i++) {
-//                                handler.post(new Runnable() {
-//                            @Override
-//                            public void run() {
                                 mAdapter.notifyItemInserted(listUser.userArrayList.size());
-//                            }
-//                        });
                     }
                     mAdapter.setLoaded();
-                    mAdapter.notifyDataSetChanged();
-//                    mAdapter.notifyItemRemoved(listUser.userArrayList.size());
+
             }
         }
     }
@@ -192,18 +188,18 @@ public class ListFragment extends  android.support.v4.app.Fragment{
             @Override
             public void onLoadMore() {
                 listUser.userArrayList.add(null);
-                mAdapter.notifyItemInserted(listUser.userArrayList.size()-1);
-                if(NetworkManager.isNetworkAvailable(getContext())){
+                mAdapter.notifyItemInserted(listUser.userArrayList.size() - 1);
+                mAdapter.notifyDataSetChanged();
+                if (NetworkManager.isNetworkAvailable(getContext())) {
                     counterOfLoading++;
-                    LoadItemsTask loadItemsTask=new LoadItemsTask(counterOfLoading);
+                    LoadItemsTask loadItemsTask = new LoadItemsTask(counterOfLoading);
                     loadItemsTask.execute();
-                } else{
-                    Toast toast = Toast.makeText(getActivity() ,"Проверьте соединение"
+                } else {
+                    Toast toast = Toast.makeText(getActivity(), "Проверьте соединение"
                             , Toast.LENGTH_SHORT);
                     toast.show();
                 }
-            }
-        });
+                    }
+                });
     }
-
 }
