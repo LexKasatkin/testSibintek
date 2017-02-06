@@ -33,6 +33,7 @@ public class ListFragment extends  android.support.v4.app.Fragment{
     int counterOfLoading;
     ListUser listUser;
     private LinearLayoutManager mLayoutManager;
+    LoadItemsTask loadItemsTask;
 
     private OnFragmentInteractionListener mListener;
     SwipeRefreshLayout mSwipeRefreshLayout;
@@ -69,9 +70,6 @@ public class ListFragment extends  android.support.v4.app.Fragment{
         View v = inflater.inflate(R.layout.fragment_list, container, false);
         mRecyclerView = (RecyclerView) v.findViewById(R.id.recyclerview);
         mSwipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipeRefreshLayout);
-        if(counterOfLoading==1){
-            mSwipeRefreshLayout.setRefreshing(true);
-        }
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -117,7 +115,10 @@ public class ListFragment extends  android.support.v4.app.Fragment{
 
 
     public class LoadItemsTask extends AsyncTask<String, Void, String> {
-
+        int counterOfLoading;
+        LoadItemsTask(int counter){
+            this.counterOfLoading=counter;
+        }
         @Override
         protected void onPreExecute() {
             urlLoad = "https://api.github.com/users/whatever/followers?page=" + String.valueOf(counterOfLoading) + "&per_page=9";
@@ -126,9 +127,11 @@ public class ListFragment extends  android.support.v4.app.Fragment{
 
         @Override
         protected String doInBackground(String... urls) {
+            synchronized (this) {
                 HTTPrequest httPrequest = new HTTPrequest(urlLoad, getContext());
                 jsonString = httPrequest.getJSONString();
                 return jsonString;
+            }
         }
 
         @Override
@@ -153,13 +156,15 @@ public class ListFragment extends  android.support.v4.app.Fragment{
                     mAdapter.notifyDataSetChanged();
                     mAdapter.setLoaded();
                     mAdapter.notifyItemRemoved(listUser.userArrayList.size() -1);
-                    counterOfLoading++;
             }
         }
     }
 
     public void LoadData(){
-       counterOfLoading=1;
+        counterOfLoading=1;
+        if(counterOfLoading==1){
+            mSwipeRefreshLayout.setRefreshing(true);
+        }
         handler = new Handler();
         listUser = new ListUser();
         mRecyclerView.setHasFixedSize(true);
@@ -168,7 +173,7 @@ public class ListFragment extends  android.support.v4.app.Fragment{
         mAdapter = new Adapter(listUser.userArrayList, mRecyclerView);
         mRecyclerView.setAdapter(mAdapter);
         if(NetworkManager.isNetworkAvailable(getContext())){
-            LoadItemsTask loadItemsTask=new LoadItemsTask();
+            loadItemsTask=new LoadItemsTask(counterOfLoading);
             loadItemsTask.execute();
         }else{
             Toast toast = Toast.makeText(getActivity(), "Проверьте соединение"
@@ -181,7 +186,8 @@ public class ListFragment extends  android.support.v4.app.Fragment{
                 listUser.userArrayList.add(null);
                 mAdapter.notifyItemInserted(listUser.userArrayList.size()-1);
                 if(NetworkManager.isNetworkAvailable(getContext())){
-                    LoadItemsTask loadItemsTask=new LoadItemsTask();
+                    counterOfLoading++;
+                    LoadItemsTask loadItemsTask=new LoadItemsTask(counterOfLoading);
                     loadItemsTask.execute();
                 } else{
                     Toast toast = Toast.makeText(getActivity() ,"Проверьте соединение"
