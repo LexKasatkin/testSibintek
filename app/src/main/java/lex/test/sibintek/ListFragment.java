@@ -155,7 +155,7 @@ public class ListFragment extends  android.support.v4.app.Fragment{
                     }
                     mAdapter.notifyDataSetChanged();
                     mAdapter.setLoaded();
-                    mAdapter.notifyItemRemoved(listUser.userArrayList.size() -1);
+                    mAdapter.notifyItemRemoved(listUser.userArrayList.size());
             }
         }
     }

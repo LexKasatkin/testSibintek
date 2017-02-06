@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.List;
 
@@ -147,9 +148,16 @@ public class Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private void fragmentJump(User mItemSelected) {
         UserFragment mFragment = new UserFragment();
         Bundle mBundle = new Bundle();
-        mBundle.putString("login", mItemSelected.getLogin());
-        mFragment.setArguments(mBundle);
-        switchContent(R.id.fragment_container, mFragment);
+        if(mItemSelected!=null) {
+            mBundle.putString("login", mItemSelected.getLogin());
+            mFragment.setArguments(mBundle);
+            switchContent(R.id.fragment_container, mFragment);
+        }else{
+            Toast toast = Toast.makeText( mContext, "Ошибка при загрузке данных пользователя"
+                    , Toast.LENGTH_SHORT);
+            toast.show();
+        }
+
     }
 
 
